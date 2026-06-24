@@ -13,12 +13,10 @@
     
     <link rel="icon" type="image/png" href="images/favicon.png">
 
-    <!-- All required fonts from the main site AND the generator -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Oswald:wght@700&family=Arimo:wght@400;700&family=Eczar:wght@600&display=swap" rel="stylesheet">
     
-    <!-- HTML2Canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
@@ -128,6 +126,7 @@
             letter-spacing: 1px;
         }
 
+        /* FIXED CSS: Bumping line-height and adding vertical margin */
         .gig-item { 
             font-family: 'Arimo', sans-serif; 
             font-weight: bold; 
@@ -136,9 +135,9 @@
             text-transform: uppercase; 
             text-align: center; 
             letter-spacing: 0.5px; 
-            line-height: .7; 
+            line-height: 1.2; 
             width: 95%; 
-            margin: 1px 0;
+            margin: 3px 0;
         }
         
         .footer-sponsors { 
@@ -179,17 +178,14 @@
         <a href="#submit">Submit a Gig</a>
     </nav>
 
-    <!-- The Live Gig Guide Section -->
     <section id="guide">
         <div id="loading-spinner" class="loading-spinner">GENERATING THIS WEEK'S GIG GUIDE...</div>
         
-        <!-- The Final Image will be placed here -->
         <img id="final-gig-image" class="guide-image" style="display: none;" alt="Weekly Gig Guide">
         
         <button id="download-btn" class="download-btn" style="display: none;" onclick="triggerDownload()">Download Graphic</button>
     </section>
 
-    <!-- Hidden Area: Where the magic is built -->
     <div id="hidden-render-area">
         <div id="gig-guide">
             <div class="main-header">
@@ -223,7 +219,6 @@
         </div>
     </footer>
 
-    <!-- GENERATOR SCRIPT -->
     <script>
         // --- YOUR NEW GOOGLE APPS SCRIPT WEB APP URL ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyn2OH9XHVVzn6iyXJkWKtWkzK2lMXfdtFeISsKrQeQTgNpfRVkoE50DV_YEstI_JVlAQ/exec?action=getGigs";
@@ -240,7 +235,36 @@
             return `${days[d.getDay()]} ${getOrdinalNum(d.getDate())} ${months[d.getMonth()]}`;
         }
 
-        // Updated buildDOM to accept JSON instead of raw text
+        // NEW LOGIC: Cleans and converts 24-hour time to AM/PM
+        function formatTime(timeStr) {
+            if (!timeStr) return "";
+            let str = timeStr.toString().toLowerCase().trim();
+            if (str.includes("tba")) return "TBA";
+
+            // If it already has AM/PM, just remove trailing ":00" if it exists
+            if (str.includes("am") || str.includes("pm")) {
+                return str.replace(':00', '').toUpperCase();
+            }
+
+            // Looks for formats like "18:00:00", "18:00", or "18"
+            const match = str.match(/^(\d{1,2})(?::(\d{2}))?/);
+            if (match) {
+                let hours = parseInt(match[1], 10);
+                let mins = match[2] || "00";
+                
+                let ampm = hours >= 12 ? "PM" : "AM";
+                hours = hours % 12;
+                hours = hours ? hours : 12; // Handle midnight/noon
+                
+                let finalStr = hours + ":" + mins + ampm;
+                return finalStr.replace(':00', ''); // Turn 5:00PM to 5PM
+            }
+            
+            // Fallback just in case
+            return str.replace(':00', '').toUpperCase();
+        }
+
+        // Updated buildDOM to format the time and accept JSON
         function buildDOM(gigs) {
             if (!gigs || gigs.length === 0) {
                 document.getElementById('loading-spinner').innerText = "No gigs published this week.";
@@ -254,7 +278,9 @@
 
             gigs.forEach(gig => {
                 const rawDate = gig.date; // e.g. "Thu, 25 Jun 2026"
-                let cleanTime = gig.time.replace(':00', ''); // Removes the seconds if they exist
+                
+                // Route the time through our new formatting function
+                let cleanTime = formatTime(gig.time); 
                 
                 // Reconstruct the text block to match your poster layout
                 const gigText = `${cleanTime} - ${gig.venue} - ${gig.artist}`;
@@ -281,19 +307,14 @@
 
         async function createAndShowGraphic() {
             try {
-                // 1. Fetch from Google Sheets using the JSON endpoint
-                // Note: Changed to '&v=' instead of '?v=' because the URL already contains '?action=getGigs'
                 const response = await fetch(SCRIPT_URL + '&v=' + new Date().getTime());
                 const data = await response.json();
                 
-                // 2. Build the hidden DOM using the new JSON data array
                 const success = buildDOM(data);
                 if (!success) return;
 
-                // 3. Wait for Google Fonts to finish loading
                 await document.fonts.ready;
                 
-                // 4. Wait 1 second to ensure local images are fully rendered in the DOM
                 setTimeout(() => {
                     const targetElement = document.getElementById('gig-guide');
                     
@@ -304,12 +325,10 @@
                     }).then(canvas => {
                         const imgData = canvas.toDataURL('image/png');
                         
-                        // Set the image source and reveal it
                         const finalImg = document.getElementById('final-gig-image');
                         finalImg.src = imgData;
                         finalImg.style.display = "block";
                         
-                        // Show the download button, hide the loader
                         document.getElementById('download-btn').style.display = "block";
                         document.getElementById('loading-spinner').style.display = "none";
                     }).catch(err => {
@@ -337,7 +356,6 @@
             setTimeout(() => { btn.innerText = "DOWNLOAD GRAPHIC"; }, 2000);
         }
 
-        // Kick off the process as soon as the page loads
         window.onload = createAndShowGraphic;
     </script>
 </body>
