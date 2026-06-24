@@ -13,346 +13,162 @@
     
     <link rel="icon" type="image/png" href="images/favicon.png">
 
+    <!-- All required fonts from the main site AND the generator -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Oswald:wght@700&family=Arimo:wght@400;700&family=Eczar:wght@600&display=swap" rel="stylesheet">
+    
+    <!-- HTML2Canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        /* Live Gig Guide Styling */
-        #gig-container {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: left;
-        }
-
-        .gig-date-header {
-            font-family: 'Oswald', sans-serif;
-            color: #DA2121;
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            border-bottom: 2px solid #333;
-            padding-bottom: 5px;
-            margin-top: 40px;
-            margin-bottom: 15px;
-        }
-
-        .gig-row {
-            display: flex;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #1a1a1a;
-            transition: background-color 0.2s ease;
-        }
-
-        .gig-row:hover {
-            background-color: #1a1a1a;
-        }
-
-        .gig-time {
-            width: 100px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .gig-artist {
-            flex-grow: 1;
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: #fff;
-        }
-
-        .gig-venue {
-            text-align: right;
-            color: #888;
-            font-size: 0.95rem;
-        }
-
-        /* Mobile adjustments for the gig list */
-        @media (max-width: 600px) {
-            .gig-row {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 15px 5px;
-            }
-            .gig-time {
-                color: #DA2121;
-                margin-bottom: 5px;
-            }
-            .gig-venue {
-                text-align: left;
-                margin-top: 5px;
-                font-size: 0.85rem;
-            }
-        }
-        /* Smooth Scrolling */
-        html {
-            scroll-behavior: smooth;
-            scroll-padding-top: 90px; /* Prevents the sticky nav from covering the content */
-        }
-
         /* Base Site Styling */
+        html { scroll-behavior: smooth; scroll-padding-top: 90px; }
         body {
             font-family: 'Montserrat', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #0a0a0a; /* Darker, punchier background */
-            color: #f4f4f4;
-            text-align: center;
-        } /* <--- This bracket was missing! */
+            margin: 0; padding: 0;
+            background-color: #0a0a0a; color: #f4f4f4; text-align: center;
+        }
 
         /* Sponsor Bar Overlay */
         .sponsor-bar {
-            position: absolute; /* Floats it over the image */
-            top: 0;
-            left: 0;
-            width: 100%;
-            box-sizing: border-box; /* Prevents padding from breaking the width */
-            /* A dark gradient that fades out, so it blends into the photo */
+            position: absolute; top: 0; left: 0; width: 100%; box-sizing: border-box; 
             background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
-            padding: 15px 20px 30px 20px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            z-index: 10; /* Ensures it sits on top of the image */
+            padding: 15px 20px 30px 20px; display: flex; align-items: center; justify-content: center; gap: 15px; z-index: 10;
         }
-
         .sponsor-bar span {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.8rem;
-            color: #d4d4d4; 
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.9); /* Adds a shadow to keep it readable over light parts of the image */
+            font-family: 'Montserrat', sans-serif; font-size: 0.8rem; color: #d4d4d4; 
+            text-transform: uppercase; letter-spacing: 1px; text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
         }
-
-        .sponsor-bar img {
-            height: 25px; 
-            width: auto;
-            filter: invert(1) opacity(0.7); /* White and semi-transparent */
-            transition: opacity 0.3s ease;
-        }
-
-        .sponsor-bar img:hover {
-            opacity: 1;
-        }
+        .sponsor-bar img { height: 25px; width: auto; filter: invert(1) opacity(0.7); transition: opacity 0.3s ease; }
+        .sponsor-bar img:hover { opacity: 1; }
 
         /* Headings */
-        h1, h2, h3 {
-            font-family: 'Oswald', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #DA2121; /* Your custom Townsville Rocks Red */
-            margin-bottom: 30px;
-            font-size: 2.2rem;
-        }
+        h1, h2, h3 { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; color: #DA2121; margin-bottom: 30px; font-size: 2.2rem; }
+        p { line-height: 1.6; color: #cccccc; margin-bottom: 20px; }
 
-        p {
-            line-height: 1.6;
-            color: #cccccc;
-            margin-bottom: 20px;
-        }
-
-        /* Main Header Section */
-        .site-header {
-            position: relative; /* CRITICAL: This keeps the overlay inside the header */
-            background-color: #000;
-            padding-bottom: 25px; 
-            border-bottom: 3px solid #DA2121;
-        }
-        
-        .site-header img.main-header-img {
-            width: 100%;
-            max-width: 1000px;
-            height: auto;
-            display: block;
-            margin: 0 auto;
-        }
-
-        /* Radio Player Inside Header */
-        .header-radio {
-            max-width: 800px;
-            margin: 20px auto 0 auto;
-            padding: 0 20px;
-        }
+        /* Header Section */
+        .site-header { position: relative; background-color: #000; padding-bottom: 25px; border-bottom: 3px solid #DA2121; }
+        .site-header img.main-header-img { width: 100%; max-width: 1000px; height: auto; display: block; margin: 0 auto; }
+        .header-radio { max-width: 800px; margin: 20px auto 0 auto; padding: 0 20px; }
 
         /* Navigation Bar */
-        nav {
-            background-color: #121212;
-            padding: 20px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid #222;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.8);
-        }
+        nav { background-color: #121212; padding: 20px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; box-shadow: 0 4px 12px rgba(0,0,0,0.8); }
+        nav a { font-family: 'Oswald', sans-serif; color: #ffffff; text-decoration: none; margin: 0 20px; font-weight: 700; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s ease; }
+        nav a:hover { color: #DA2121; }
 
-        nav a {
-            font-family: 'Oswald', sans-serif;
-            color: #ffffff;
-            text-decoration: none;
-            margin: 0 20px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: color 0.3s ease;
-        }
+        /* Section Layouts */
+        section { padding: 40px 30px; width: 85%; max-width: 900px; margin: 40px auto; background-color: #121212; border-radius: 12px; border: 1px solid #222; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
 
-        nav a:hover {
-            color: #DA2121;
-        }
+        /* Responsive Iframe */
+        iframe { width: 100%; height: 800px; border: 2px solid #222; border-radius: 8px; background-color: #ffffff; box-shadow: 0 6px 16px rgba(0,0,0,0.9); }
+        .subtle-booking { max-width: 800px; margin: 0 auto 40px auto; padding: 0 20px; text-align: center; }
+        .subtle-booking p { font-size: 1rem; color: #888888; line-height: 1.6; }
+        .subtle-booking a { color: #DA2121; text-decoration: none; font-weight: bold; transition: color 0.3s ease; }
+        .subtle-booking a:hover { color: #ffffff; }
 
-        /* Section Layouts (Card Effect) */
-        section {
-            padding: 40px 30px; /* Reduced top/bottom padding to tighten it up */
-            width: 85%; /* Card width relative to the screen */
-            max-width: 900px; /* Limits how wide the card gets on massive screens */
-            margin: 40px auto;
-            background-color: #121212; 
-            border-radius: 12px;
-            border: 1px solid #222;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-        }
+        /* Footer */
+        footer { background-color: #000000; padding: 50px 20px; margin-top: 60px; border-top: 2px solid #DA2121; }
+        .contact-links a { display: inline-block; font-family: 'Oswald', sans-serif; color: #ffffff; background-color: #1a1a1a; border: 2px solid #DA2121; text-decoration: none; margin: 10px 15px; padding: 12px 30px; border-radius: 6px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; }
+        .contact-links a:hover { background-color: #DA2121; box-shadow: 0 0 15px rgba(218, 33, 33, 0.4); }
 
-        /* Gig Guide Image */
-        .guide-image {
-            width: 100%; /* Image fills the entire width of the card */
-            height: auto;
-            border-radius: 8px;
-            border: 2px solid #222;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.9);
-            display: block; /* Removes weird spacing under the image */
-        }
-
-        /* Responsive Iframe for Google Form */
-        iframe {
-            width: 100%; /* Form fills the entire width of the card */
-            height: 800px; /* Default height for desktop */
-            border: 2px solid #222;
-            border-radius: 8px;
-            background-color: #ffffff;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.9);
-        }
-
-        /* Subtle Booking Banner */
-        .subtle-booking {
-            max-width: 800px;
-            margin: 0 auto 40px auto;
-            padding: 0 20px;
-            text-align: center;
-        }
-
-        .subtle-booking p {
-            font-size: 1rem;
-            color: #888888; /* Darker grey keeps it visually quiet */
-            line-height: 1.6;
-        }
-
-        .subtle-booking a {
-            color: #DA2121;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-
-        .subtle-booking a:hover {
-            color: #ffffff;
-        }
-
-        /* Footer & Contact Info */
-        footer {
-            background-color: #000000;
-            padding: 50px 20px;
-            margin-top: 60px;
-            border-top: 2px solid #DA2121;
-        }
-
-        .contact-links a {
-            display: inline-block;
-            font-family: 'Oswald', sans-serif;
-            color: #ffffff;
-            background-color: #1a1a1a;
-            border: 2px solid #DA2121;
-            text-decoration: none;
-            margin: 10px 15px;
-            padding: 12px 30px;
-            border-radius: 6px;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-        }
-
-        .contact-links a:hover {
-            background-color: #DA2121;
-            box-shadow: 0 0 15px rgba(218, 33, 33, 0.4); 
-        }
-
-        /* ------------------------------------- */
-        /* MOBILE RESPONSIVENESS FIXES           */
-        /* ------------------------------------- */
-        @media (max-width: 600px) {
-            nav {
-                display: none; 
-            }
-
-            /* Pushes the main header image down so the sponsor bar doesn't cover it */
-            .site-header {
-                padding-top: 35px; 
-            }
-
-            /* Keeps the sponsor bar on one line */
-            .sponsor-bar {
-                flex-direction: row; 
-                gap: 8px;
-                padding: 8px 10px 25px 10px;
-            }
-
-            .sponsor-bar span {
-                font-size: 0.65rem; /* Shrinks text slightly to fit */
-            }
-            
-            .sponsor-bar img {
-                height: 16px; /* Shrinks logo slightly to fit */
-            }
-
-            .header-radio {
-                transform: scale(0.85); 
-                transform-origin: center top;
-                margin-bottom: -15px; 
-            }
-
-            section {
-                width: 95%; /* Cards take up almost the whole screen on phones */
-                padding: 20px 10px; /* Tighter padding for small screens */
-                margin: 20px auto; 
-            }
-
-            iframe {
-                height: 950px; /* Gives the Google Form extra vertical breathing room */
-            }
-
-            .contact-links a {
-                display: block; 
-                margin: 15px auto;
-                max-width: 250px;
-            }
+        /* Gig Guide View Specifics */
+        .guide-image { width: 100%; max-width: 520px; height: auto; border-radius: 8px; border: 2px solid #222; box-shadow: 0 6px 16px rgba(0,0,0,0.9); display: block; margin: 0 auto 20px auto; }
+        .loading-spinner { font-family: 'Oswald', sans-serif; font-size: 1.5rem; color: #DA2121; padding: 40px 0; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
         
+        .download-btn { display: block; width: 100%; max-width: 300px; margin: 0 auto; padding: 15px; background-color: #DA2121; color: #fff; font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 1.1rem; border: none; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; }
+        .download-btn:hover { background-color: #ff3333; box-shadow: 0 0 15px rgba(218, 33, 33, 0.4); }
+
+        /* -------------------------------------------------------------
+           THE INVISIBLE GENERATOR CANVAS (Renders off-screen)
+           ------------------------------------------------------------- */
+        #hidden-render-area { position: absolute; left: -9999px; top: 0; }
+        
+        #gig-guide {
+            width: 520px; 
+            background: #000000; 
+            box-sizing: border-box;
+            padding: 15px 60px 15px 60px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+        }
+
+        .main-header img { max-width: 100%; height: auto; margin: 10px 0; }
+        
+        .content-wrapper { 
+            background: #ffffff; 
+            width: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding-top: 10px;
+        }
+        
+        #guide-content { width: 100%; padding-bottom: 4px; display: flex; flex-direction: column; align-items: center; }
+        #guide-content .date-banner:first-child { margin-top: -15px; }
+        
+        .date-banner {
+            font-family: 'Eczar', sans-serif; 
+            font-weight: 600; 
+            text-shadow: 1px 1px 0px rgba(0, 0, 255, 0.4), 1.5px 1.5px 0px rgba(0, 0, 255, 0.2);           
+            background: #D9652B; 
+            color: #fff; 
+            width: 102%; 
+            text-align: center; 
+            padding-top: 2.5px; 
+            padding-bottom: 2.5px;
+            line-height: 1.1; 
+            font-size: 19px; 
+            border-radius: 20px; 
+            margin-top: 3px; 
+            margin-bottom: 2px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+        }
+
+        .gig-item { 
+            font-family: 'Arimo', sans-serif; 
+            font-weight: bold; 
+            font-size: 9px; 
+            color: #000; 
+            text-transform: uppercase; 
+            text-align: center; 
+            letter-spacing: 0.5px; 
+            line-height: .7; 
+            width: 95%; 
+            margin: 1px 0;
+        }
+        
+        .footer-sponsors { 
+            width: 100%; 
+            display: flex; 
+            justify-content: center; 
+            gap: 10px; 
+            align-items: center; 
+            box-sizing: border-box; 
+            border-top: 15px solid #000000; 
+            padding: 0px 0px; 
+            background: #ffffff;
+        }
+        
+        .footer-sponsors img { 
+            max-height: 90px; 
+            width: auto; 
+            max-width: 45%; 
+            object-fit: contain; 
         }
     </style>
 </head>
 <body>
 
     <header class="site-header">
-        
         <div class="sponsor-bar">
             <span>Brought to you by</span>
             <img src="images/Regional Roster Logo V1.png" alt="Regional Roster">
         </div>
-
         <img class="main-header-img" src="images/Header.jpg" alt="Townsville Rocks">
-        
         <div class="header-radio">
             <script src="https://embed.radio.co/player/a6a91a6.js"></script>
         </div>
@@ -363,60 +179,32 @@
         <a href="#submit">Submit a Gig</a>
     </nav>
 
+    <!-- The Live Gig Guide Section -->
     <section id="guide">
-        <h1>This Week's Live Music</h1>
-        <div id="gig-container">
-            <p style="text-align:center;">Loading live gig data...</p>
-        </div>
+        <div id="loading-spinner" class="loading-spinner">GENERATING THIS WEEK'S GIG GUIDE...</div>
+        
+        <!-- The Final Image will be placed here -->
+        <img id="final-gig-image" class="guide-image" style="display: none;" alt="Weekly Gig Guide">
+        
+        <button id="download-btn" class="download-btn" style="display: none;" onclick="triggerDownload()">Download Graphic</button>
     </section>
 
-    <script>
-        // PASTE YOUR WEB APP URL HERE, AND LEAVE "?action=getGigs" ON THE END!
-        const API_URL = "https://script.google.com/macros/s/AKfycbyn2OH9XHVVzn6iyXJkWKtWkzK2lMXfdtFeISsKrQeQTgNpfRVkoE50DV_YEstI_JVlAQ/exec?action=getGigs";
-        async function loadGigs() {
-            try {
-                const response = await fetch(API_URL);
-                const gigs = await response.json();
-                
-                const container = document.getElementById('gig-container');
-                container.innerHTML = ""; // Clear the loading text
-
-                if (gigs.length === 0) {
-                    container.innerHTML = "<p style='text-align:center;'>No gigs scheduled for this week yet. Check back soon!</p>";
-                    return;
-                }
-
-                let currentDate = "";
-
-                gigs.forEach(gig => {
-                    // When the date changes, print a new bold red header
-                    if (gig.date !== currentDate) {
-                        const dateHeader = document.createElement('div');
-                        dateHeader.className = "gig-date-header";
-                        dateHeader.innerText = gig.date;
-                        container.appendChild(dateHeader);
-                        currentDate = gig.date;
-                    }
-
-                    // Build the row for the actual gig
-                    const row = document.createElement('div');
-                    row.className = "gig-row";
-                    row.innerHTML = `
-                        <div class="gig-time">${gig.time}</div>
-                        <div class="gig-artist">${gig.artist}</div>
-                        <div class="gig-venue">@ ${gig.venue}</div>
-                    `;
-                    container.appendChild(row);
-                });
-
-            } catch (error) {
-                document.getElementById('gig-container').innerHTML = "<p style='text-align:center; color:red;'>Error loading gig guide. Please try refreshing the page.</p>";
-            }
-        }
-
-        // Run the function as soon as the page loads
-        loadGigs();
-    </script>
+    <!-- Hidden Area: Where the magic is built -->
+    <div id="hidden-render-area">
+        <div id="gig-guide">
+            <div class="main-header">
+                <img src="images/main_logo.png" alt="Townsville Rocks">
+            </div>
+            <div class="content-wrapper">
+                <div id="guide-content"></div>
+                <div class="footer-sponsors">
+                    <img src="images/puft.png" alt="Puft Events">
+                    <img src="images/warehouse.png" alt="The Warehouse">
+                    <img src="images/cotters.png" alt="Cotters Market">
+                </div>
+            </div>
+        </div>
+    </div>
 
     <section id="submit">
         <h2>Submit gigs here</h2>
@@ -424,7 +212,7 @@
     </section>
 
     <div class="subtle-booking">
-        <p>Looking to book live music for your venue or an upcoming event?
+        <p>Looking to book live music for your venue or an upcoming event?</p>
     </div>
 
     <footer>
@@ -435,5 +223,122 @@
         </div>
     </footer>
 
+    <!-- GENERATOR SCRIPT -->
+    <script>
+        // --- YOUR NEW GOOGLE APPS SCRIPT WEB APP URL ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyn2OH9XHVVzn6iyXJkWKtWkzK2lMXfdtFeISsKrQeQTgNpfRVkoE50DV_YEstI_JVlAQ/exec?action=getGigs";
+
+        function getOrdinalNum(n) {
+            return n + (n > 0 ? ['TH', 'ST', 'ND', 'RD'][(n > 3 && n < 21) || n % 10 > 3 ? 0 : n % 10] : '');
+        }
+
+        function formatHeaderDate(dateStr) {
+            const d = new Date(dateStr);
+            if (isNaN(d)) return dateStr.toUpperCase();
+            const days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+            const months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+            return `${days[d.getDay()]} ${getOrdinalNum(d.getDate())} ${months[d.getMonth()]}`;
+        }
+
+        // Updated buildDOM to accept JSON instead of raw text
+        function buildDOM(gigs) {
+            if (!gigs || gigs.length === 0) {
+                document.getElementById('loading-spinner').innerText = "No gigs published this week.";
+                return false;
+            }
+
+            const container = document.getElementById('guide-content');
+            container.innerHTML = ''; 
+
+            let currentGroupDate = "";
+
+            gigs.forEach(gig => {
+                const rawDate = gig.date; // e.g. "Thu, 25 Jun 2026"
+                let cleanTime = gig.time.replace(':00', ''); // Removes the seconds if they exist
+                
+                // Reconstruct the text block to match your poster layout
+                const gigText = `${cleanTime} - ${gig.venue} - ${gig.artist}`;
+
+                if (rawDate && gigText) {
+                    const formattedHeader = formatHeaderDate(rawDate);
+
+                    if (formattedHeader !== currentGroupDate) {
+                        const dateEl = document.createElement('div');
+                        dateEl.className = 'date-banner';
+                        dateEl.innerText = formattedHeader;
+                        container.appendChild(dateEl);
+                        currentGroupDate = formattedHeader;
+                    }
+
+                    const gigEl = document.createElement('div');
+                    gigEl.className = 'gig-item';
+                    gigEl.innerText = gigText.toUpperCase(); // Force uppercase to look like the poster
+                    container.appendChild(gigEl);
+                }
+            });
+            return true;
+        }
+
+        async function createAndShowGraphic() {
+            try {
+                // 1. Fetch from Google Sheets using the JSON endpoint
+                // Note: Changed to '&v=' instead of '?v=' because the URL already contains '?action=getGigs'
+                const response = await fetch(SCRIPT_URL + '&v=' + new Date().getTime());
+                const data = await response.json();
+                
+                // 2. Build the hidden DOM using the new JSON data array
+                const success = buildDOM(data);
+                if (!success) return;
+
+                // 3. Wait for Google Fonts to finish loading
+                await document.fonts.ready;
+                
+                // 4. Wait 1 second to ensure local images are fully rendered in the DOM
+                setTimeout(() => {
+                    const targetElement = document.getElementById('gig-guide');
+                    
+                    html2canvas(targetElement, {
+                        backgroundColor: "#000000",
+                        scale: 2, 
+                        useCORS: true 
+                    }).then(canvas => {
+                        const imgData = canvas.toDataURL('image/png');
+                        
+                        // Set the image source and reveal it
+                        const finalImg = document.getElementById('final-gig-image');
+                        finalImg.src = imgData;
+                        finalImg.style.display = "block";
+                        
+                        // Show the download button, hide the loader
+                        document.getElementById('download-btn').style.display = "block";
+                        document.getElementById('loading-spinner').style.display = "none";
+                    }).catch(err => {
+                        console.error("Canvas Error:", err);
+                        document.getElementById('loading-spinner').innerText = "Error rendering graphic.";
+                    });
+                }, 1000);
+
+            } catch (error) {
+                console.error("Fetch error:", error);
+                document.getElementById('loading-spinner').innerText = "Error pulling gig data.";
+            }
+        }
+
+        function triggerDownload() {
+            const btn = document.getElementById('download-btn');
+            btn.innerText = "DOWNLOADING...";
+            
+            const imgData = document.getElementById('final-gig-image').src;
+            const link = document.createElement('a');
+            link.download = 'townsville-rocks-gig-guide.png';
+            link.href = imgData;
+            link.click();
+            
+            setTimeout(() => { btn.innerText = "DOWNLOAD GRAPHIC"; }, 2000);
+        }
+
+        // Kick off the process as soon as the page loads
+        window.onload = createAndShowGraphic;
+    </script>
 </body>
 </html>
