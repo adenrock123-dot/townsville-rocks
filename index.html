@@ -18,6 +18,72 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Oswald:wght@700&display=swap" rel="stylesheet">
 
     <style>
+        /* Live Gig Guide Styling */
+        #gig-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .gig-date-header {
+            font-family: 'Oswald', sans-serif;
+            color: #DA2121;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+            margin-top: 40px;
+            margin-bottom: 15px;
+        }
+
+        .gig-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #1a1a1a;
+            transition: background-color 0.2s ease;
+        }
+
+        .gig-row:hover {
+            background-color: #1a1a1a;
+        }
+
+        .gig-time {
+            width: 100px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .gig-artist {
+            flex-grow: 1;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .gig-venue {
+            text-align: right;
+            color: #888;
+            font-size: 0.95rem;
+        }
+
+        /* Mobile adjustments for the gig list */
+        @media (max-width: 600px) {
+            .gig-row {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 15px 5px;
+            }
+            .gig-time {
+                color: #DA2121;
+                margin-bottom: 5px;
+            }
+            .gig-venue {
+                text-align: left;
+                margin-top: 5px;
+                font-size: 0.85rem;
+            }
+        }
         /* Smooth Scrolling */
         html {
             scroll-behavior: smooth;
@@ -298,8 +364,60 @@
     </nav>
 
     <section id="guide">
-        <img src="images/gig_guide.png" alt="Weekly Gig Guide" class="guide-image">
+        <h1>This Week's Live Music</h1>
+        <div id="gig-container">
+            <p style="text-align:center;">Loading live gig data...</p>
+        </div>
     </section>
+
+    <script>
+        // PASTE YOUR WEB APP URL HERE, AND LEAVE "?action=getGigs" ON THE END!
+        const API_URL = "YOUR_WEB_APP_URL_HERE?action=getGigs";
+
+        async function loadGigs() {
+            try {
+                const response = await fetch(API_URL);
+                const gigs = await response.json();
+                
+                const container = document.getElementById('gig-container');
+                container.innerHTML = ""; // Clear the loading text
+
+                if (gigs.length === 0) {
+                    container.innerHTML = "<p style='text-align:center;'>No gigs scheduled for this week yet. Check back soon!</p>";
+                    return;
+                }
+
+                let currentDate = "";
+
+                gigs.forEach(gig => {
+                    // When the date changes, print a new bold red header
+                    if (gig.date !== currentDate) {
+                        const dateHeader = document.createElement('div');
+                        dateHeader.className = "gig-date-header";
+                        dateHeader.innerText = gig.date;
+                        container.appendChild(dateHeader);
+                        currentDate = gig.date;
+                    }
+
+                    // Build the row for the actual gig
+                    const row = document.createElement('div');
+                    row.className = "gig-row";
+                    row.innerHTML = `
+                        <div class="gig-time">${gig.time}</div>
+                        <div class="gig-artist">${gig.artist}</div>
+                        <div class="gig-venue">@ ${gig.venue}</div>
+                    `;
+                    container.appendChild(row);
+                });
+
+            } catch (error) {
+                document.getElementById('gig-container').innerHTML = "<p style='text-align:center; color:red;'>Error loading gig guide. Please try refreshing the page.</p>";
+            }
+        }
+
+        // Run the function as soon as the page loads
+        loadGigs();
+    </script>
 
     <section id="submit">
         <h2>Submit gigs here</h2>
