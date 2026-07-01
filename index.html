@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-J57H57WF51"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-J57H57WF51');
-    </script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Townsville Gig Guide | Townsville Rocks</title>
@@ -33,8 +24,7 @@
         html { scroll-behavior: smooth; scroll-padding-top: 90px; }
         body {
             font-family: 'Montserrat', sans-serif;
-            margin: 0; 
-            padding: 0 0 75px 0; 
+            margin: 0; padding: 0;
             background-color: #0a0a0a; color: #f4f4f4; text-align: center;
         }
 
@@ -58,9 +48,7 @@
         /* Header Section */
         .site-header { position: relative; background-color: #000; padding-bottom: 25px; border-bottom: 3px solid #DA2121; }
         .site-header img.main-header-img { width: 100%; max-width: 1000px; height: auto; display: block; margin: 0 auto; }
-
-        /* Embed Player Overrides */
-        .spotify-player { height: 152px !important; border: none !important; background-color: transparent !important; box-shadow: none !important; }
+        .header-radio { max-width: 800px; margin: 20px auto 0 auto; padding: 0 20px; }
 
         /* Navigation Bar */
         nav { background-color: #121212; padding: 20px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; box-shadow: 0 4px 12px rgba(0,0,0,0.8); }
@@ -82,7 +70,8 @@
         .contact-links a { display: inline-block; font-family: 'Oswald', sans-serif; color: #ffffff; background-color: #1a1a1a; border: 2px solid #DA2121; text-decoration: none; margin: 10px 15px; padding: 12px 30px; border-radius: 6px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; }
         .contact-links a:hover { background-color: #DA2121; box-shadow: 0 0 15px rgba(218, 33, 33, 0.4); }
 
-        /* Loading Spinner */
+        /* Gig Guide View Specifics */
+        .guide-image { width: 100%; max-width: 800px; height: auto; border-radius: 8px; border: 2px solid #222; box-shadow: 0 6px 16px rgba(0,0,0,0.9); display: block; margin: 0 auto 20px auto; }
         .loading-spinner { font-family: 'Oswald', sans-serif; font-size: 1.5rem; color: #DA2121; padding: 40px 0; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
         
@@ -90,21 +79,18 @@
         .download-btn:hover { background-color: #ff3333; box-shadow: 0 0 15px rgba(218, 33, 33, 0.4); }
 
         /* -------------------------------------------------------------
-           THE LIVE INTERACTIVE GIG GUIDE
+           THE INVISIBLE GENERATOR CANVAS (Renders off-screen)
            ------------------------------------------------------------- */
+        #hidden-render-area { position: absolute; left: -9999px; top: 0; }
+        
         #gig-guide {
-            width: 100%; 
-            max-width: 520px; 
+            width: 520px; 
             background: #000000; 
             box-sizing: border-box;
             padding: 15px 60px 15px 60px; 
-            display: none; /* Hidden until data loads */
+            display: flex; 
             flex-direction: column; 
             align-items: center;
-            margin: 0 auto 20px auto;
-            border: 2px solid #222; 
-            border-radius: 8px; 
-            box-shadow: 0 6px 16px rgba(0,0,0,0.9);
         }
 
         .main-header img { max-width: 100%; height: auto; margin: 10px 0; }
@@ -124,7 +110,7 @@
         .date-banner {
             font-family: 'Eczar', sans-serif; 
             font-weight: 600; 
-            text-shadow: 1px 1px 0px rgba(0, 0, 255, 0.4), 1.5px 1.5px 0px rgba(0, 0, 255, 0.2);            
+            text-shadow: 1px 1px 0px rgba(0, 0, 255, 0.4), 1.5px 1.5px 0px rgba(0, 0, 255, 0.2);           
             background: #D9652B; 
             color: #fff; 
             width: 102%; 
@@ -140,6 +126,7 @@
             letter-spacing: 1px;
         }
 
+        /* FIXED CSS: Bumping line-height and adding vertical margin */
         .gig-item { 
             font-family: 'Arimo', sans-serif; 
             font-weight: bold; 
@@ -151,17 +138,6 @@
             line-height: .35em; 
             width: 95%; 
             margin: 3px 0;
-        }
-        
-        /* Styling for promo links */
-        .gig-item a { 
-            color: #DA2121; 
-            text-decoration: none; 
-            transition: color 0.3s ease; 
-        }
-        .gig-item a:hover { 
-            color: #D9652B; 
-            text-decoration: underline; 
         }
         
         .footer-sponsors { 
@@ -182,28 +158,6 @@
             max-width: 45%; 
             object-fit: contain; 
         }
-
-        /* -------------------------------------------------------------
-           STICKY BOTTOM AUDIO PLAYER
-           ------------------------------------------------------------- */
-        .sticky-player {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 75px;
-            background-color: #121212; border-top: 2px solid #DA2121;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.8); z-index: 1000;
-        }
-        .sticky-player-content { display: flex; align-items: center; justify-content: space-between; width: 90%; max-width: 900px; }
-        .sticky-player-info { display: flex; align-items: center; gap: 15px; }
-        .sticky-player-info img { height: 40px; width: 40px; border-radius: 4px; background-color: #000; object-fit: contain; }
-        .sticky-player-text { text-align: left; }
-        .sticky-player-text h4 { margin: 0 0 3px 0; font-family: 'Oswald', sans-serif; color: #DA2121; text-transform: uppercase; font-size: 1.1rem; line-height: 1; letter-spacing: 0.5px; }
-        .sticky-player-text p { margin: 0; font-size: 0.75rem; color: #888; line-height: 1; }
-        .sticky-audio { width: 350px; height: 40px; outline: none; }
-        
-        @media (max-width: 600px) {
-            .sticky-player-info { display: none; }
-            .sticky-audio { width: 100%; }
-        }
     </style>
 </head>
 <body>
@@ -214,17 +168,25 @@
             <img src="images/Regional Roster Logo V1.png" alt="Regional Roster">
         </div>
         <img class="main-header-img" src="images/Header.jpg" alt="Townsville Rocks">
+        <div class="header-radio">
+            <script src="https://embed.radio.co/player/a6a91a6.js"></script>
+        </div>
     </header>
     
     <nav>
         <a href="#guide">This Week's Gigs</a>
-        <a href="#playlist">Local Playlist</a>
         <a href="#submit">Submit a Gig</a>
     </nav>
 
     <section id="guide">
         <div id="loading-spinner" class="loading-spinner">GENERATING THIS WEEK'S GIG GUIDE...</div>
         
+        <img id="final-gig-image" class="guide-image" style="display: none;" alt="Weekly Gig Guide">
+        
+        <button id="download-btn" class="download-btn" style="display: none;" onclick="triggerDownload()">Download Graphic</button>
+    </section>
+
+    <div id="hidden-render-area">
         <div id="gig-guide">
             <div class="main-header">
                 <img src="images/main_logo.png" alt="Townsville Rocks">
@@ -238,14 +200,7 @@
                 </div>
             </div>
         </div>
-        
-        <button id="download-btn" class="download-btn" style="display: none;" onclick="triggerDownload()">Download Graphic</button>
-    </section>
-
-    <section id="playlist">
-        <h2>Townsville Rocks Playlist</h2>
-        <iframe class="spotify-player" src="https://open.spotify.com/embed/playlist/5NngWAxhv4iAD8JCVXf6AF?utm_source=generator&si=293dfeb1dfb24da5" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-    </section>
+    </div>
 
     <section id="submit">
         <h2>Submit gigs here</h2>
@@ -264,23 +219,8 @@
         </div>
     </footer>
 
-    <div class="sticky-player">
-        <div class="sticky-player-content">
-            <div class="sticky-player-info">
-                <img src="images/favicon.png" alt="OzInDi Radio">
-                <div class="sticky-player-text">
-                    <h4>OzInDi Radio</h4>
-                    <p>Live Australian Music</p>
-                </div>
-            </div>
-            <audio class="sticky-audio" controls preload="none">
-                <source src="https://stream.zeno.fm/ozindi-radio-australia" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
-        </div>
-    </div>
-
     <script>
+        // --- YOUR NEW GOOGLE APPS SCRIPT WEB APP URL ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyn2OH9XHVVzn6iyXJkWKtWkzK2lMXfdtFeISsKrQeQTgNpfRVkoE50DV_YEstI_JVlAQ/exec?action=getGigs";
 
         function getOrdinalNum(n) {
@@ -295,15 +235,18 @@
             return `${days[d.getDay()]} ${getOrdinalNum(d.getDate())} ${months[d.getMonth()]}`;
         }
 
+        // NEW LOGIC: Cleans and converts 24-hour time to AM/PM
         function formatTime(timeStr) {
             if (!timeStr) return "";
             let str = timeStr.toString().toLowerCase().trim();
             if (str.includes("tba")) return "TBA";
 
+            // If it already has AM/PM, just remove trailing ":00" if it exists
             if (str.includes("am") || str.includes("pm")) {
                 return str.replace(':00', '').toUpperCase();
             }
 
+            // Looks for formats like "18:00:00", "18:00", or "18"
             const match = str.match(/^(\d{1,2})(?::(\d{2}))?/);
             if (match) {
                 let hours = parseInt(match[1], 10);
@@ -311,15 +254,17 @@
                 
                 let ampm = hours >= 12 ? "PM" : "AM";
                 hours = hours % 12;
-                hours = hours ? hours : 12; 
+                hours = hours ? hours : 12; // Handle midnight/noon
                 
                 let finalStr = hours + ":" + mins + ampm;
-                return finalStr.replace(':00', ''); 
+                return finalStr.replace(':00', ''); // Turn 5:00PM to 5PM
             }
             
+            // Fallback just in case
             return str.replace(':00', '').toUpperCase();
         }
 
+        // Updated buildDOM to format the time and accept JSON
         function buildDOM(gigs) {
             if (!gigs || gigs.length === 0) {
                 document.getElementById('loading-spinner').innerText = "No gigs published this week.";
@@ -332,8 +277,12 @@
             let currentGroupDate = "";
 
             gigs.forEach(gig => {
-                const rawDate = gig.date; 
+                const rawDate = gig.date; // e.g. "Thu, 25 Jun 2026"
+                
+                // Route the time through our new formatting function
                 let cleanTime = formatTime(gig.time); 
+                
+                // Reconstruct the text block to match your poster layout
                 const gigText = `${cleanTime} - ${gig.venue} - ${gig.artist}`;
 
                 if (rawDate && gigText) {
@@ -349,15 +298,7 @@
 
                     const gigEl = document.createElement('div');
                     gigEl.className = 'gig-item';
-                    
-                    // Intercept 'The Warehouse' gigs and turn them into links
-                    const venueName = (gig.venue || "").toLowerCase().trim();
-                    if (venueName === "the warehouse" && gig.ticketLink) {
-                        gigEl.innerHTML = `<a href="${gig.ticketLink}" target="_blank">${gigText.toUpperCase()}</a>`;
-                    } else {
-                        gigEl.innerText = gigText.toUpperCase(); 
-                    }
-                    
+                    gigEl.innerText = gigText.toUpperCase(); // Force uppercase to look like the poster
                     container.appendChild(gigEl);
                 }
             });
@@ -374,10 +315,27 @@
 
                 await document.fonts.ready;
                 
-                // Show the interactive HTML guide and the download button
-                document.getElementById('loading-spinner').style.display = "none";
-                document.getElementById('gig-guide').style.display = "flex";
-                document.getElementById('download-btn').style.display = "block";
+                setTimeout(() => {
+                    const targetElement = document.getElementById('gig-guide');
+                    
+                    html2canvas(targetElement, {
+                        backgroundColor: "#000000",
+                        scale: 2, 
+                        useCORS: true 
+                    }).then(canvas => {
+                        const imgData = canvas.toDataURL('image/png');
+                        
+                        const finalImg = document.getElementById('final-gig-image');
+                        finalImg.src = imgData;
+                        finalImg.style.display = "block";
+                        
+                        document.getElementById('download-btn').style.display = "block";
+                        document.getElementById('loading-spinner').style.display = "none";
+                    }).catch(err => {
+                        console.error("Canvas Error:", err);
+                        document.getElementById('loading-spinner').innerText = "Error rendering graphic.";
+                    });
+                }, 1000);
 
             } catch (error) {
                 console.error("Fetch error:", error);
@@ -389,25 +347,13 @@
             const btn = document.getElementById('download-btn');
             btn.innerText = "DOWNLOADING...";
             
-            const targetElement = document.getElementById('gig-guide');
+            const imgData = document.getElementById('final-gig-image').src;
+            const link = document.createElement('a');
+            link.download = 'townsville-rocks-gig-guide.png';
+            link.href = imgData;
+            link.click();
             
-            // Generate the image on the fly ONLY when the button is clicked
-            html2canvas(targetElement, {
-                backgroundColor: "#000000",
-                scale: 2, 
-                useCORS: true 
-            }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.download = 'townsville-rocks-gig-guide.png';
-                link.href = imgData;
-                link.click();
-                
-                setTimeout(() => { btn.innerText = "DOWNLOAD GRAPHIC"; }, 2000);
-            }).catch(err => {
-                console.error("Canvas Error:", err);
-                btn.innerText = "ERROR DOWNLOADING";
-            });
+            setTimeout(() => { btn.innerText = "DOWNLOAD GRAPHIC"; }, 2000);
         }
 
         window.onload = createAndShowGraphic;
