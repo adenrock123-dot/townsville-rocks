@@ -211,9 +211,45 @@
         .sticky-player-text p { margin: 0; font-size: 0.85rem; color: #ddd; line-height: 1; overflow: hidden; text-overflow: ellipsis; }
         .sticky-audio { width: 350px; height: 40px; outline: none; margin-left: 20px; }
         
+        /* -------------------------------------------------------------
+           MOBILE RESPONSIVENESS FIXES
+           ------------------------------------------------------------- */
         @media (max-width: 650px) {
+            /* Hide the radio artwork on small phones to save space */
             .sticky-player-info { display: none; }
             .sticky-audio { width: 100%; margin-left: 0; }
+            
+            /* Expand the section width and reduce the outer padding */
+            section {
+                width: 95%; 
+                padding: 20px 15px;
+            }
+            
+            /* Drastically reduce the internal gig guide padding so text fits */
+            #gig-guide {
+                padding: 15px 10px 15px 10px; 
+            }
+            
+            #guide-content .date-banner:first-child { 
+                margin-top: -18px; 
+            }
+            
+            /* Scale down the text sizes slightly so it stays visually tight */
+            .date-banner {
+                font-size: 20px;
+                padding-top: 3px;
+                padding-bottom: 2px;
+            }
+            
+            .gig-item {
+                font-size: 11px;
+                line-height: 1.2em; /* CRUCIAL: prevents text crashing if it wraps to a second line */
+                margin: 4px 0;
+            }
+
+            .footer-sponsors img {
+                max-width: 30%; /* Ensures logos scale down side-by-side */
+            }
         }
     </style>
 </head>
