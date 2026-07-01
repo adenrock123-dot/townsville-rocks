@@ -215,9 +215,45 @@
            MOBILE RESPONSIVENESS FIXES
            ------------------------------------------------------------- */
         @media (max-width: 650px) {
-            /* Hide the radio artwork on small phones to save space */
-            .sticky-player-info { display: none; }
-            .sticky-audio { width: 100%; margin-left: 0; }
+            /* Navigation links stack vertically and center */
+            nav {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 0;
+            }
+            nav a {
+                margin: 0;
+            }
+
+            /* Prevent the new taller radio player from covering the footer */
+            body { padding-bottom: 130px; }
+
+            /* Stack the radio player info on top of the audio controls */
+            .sticky-player { 
+                height: auto; 
+                padding: 10px 0; 
+            }
+            .sticky-player-content { 
+                flex-direction: column; 
+                gap: 10px; 
+            }
+            .sticky-player-info { 
+                display: flex; /* Brings the text/logos back from being hidden */
+                width: 100%; 
+                justify-content: center; 
+            }
+            .sticky-player-info img { 
+                height: 35px; 
+                width: 35px; 
+            }
+            .sticky-player-text h4 { 
+                font-size: 1rem; 
+            }
+            .sticky-audio { 
+                width: 95%; 
+                margin-left: 0; 
+            }
             
             /* Expand the section width and reduce the outer padding */
             section {
