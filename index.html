@@ -28,6 +28,9 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <style>
         /* Base Site Styling */
         html { scroll-behavior: smooth; scroll-padding-top: 90px; }
@@ -191,6 +194,69 @@
         }
 
         /* -------------------------------------------------------------
+           VENUE INTERACTIVE MAP
+           ------------------------------------------------------------- */
+        #venue-map {
+            width: 100%;
+            height: 450px;
+            border-radius: 8px;
+            border: 2px solid #222;
+            z-index: 1; 
+            background-color: #222; 
+        }
+        
+        .leaflet-popup-content-wrapper {
+            background: #ffffff;
+            color: #333;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .leaflet-popup-content {
+            margin: 5px;
+        }
+        .popup-venue-title {
+            font-family: 'Oswald', sans-serif; 
+            font-size: 1.3rem; 
+            color: #DA2121; 
+            margin-bottom: 8px; 
+            border-bottom: 2px solid #D9652B; 
+            padding-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        /* NEW: Map Popup Links Styling */
+        .popup-venue-title a {
+            color: #D9652B; 
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .popup-venue-title a:hover {
+            color: #DA2121; 
+        }
+        .popup-gig-item a {
+            color: #DA2121; 
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .popup-gig-item a:hover {
+            color: #D9652B; 
+            text-decoration: underline;
+        }
+
+        .popup-gig-list {
+            font-family: 'Montserrat', sans-serif; 
+            font-size: 0.95rem; 
+            color: #000; 
+            max-height: 160px; 
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        .popup-gig-item {
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        /* -------------------------------------------------------------
            STICKY BOTTOM AUDIO PLAYER
            ------------------------------------------------------------- */
         .sticky-player {
@@ -215,7 +281,6 @@
            MOBILE RESPONSIVENESS FIXES
            ------------------------------------------------------------- */
         @media (max-width: 650px) {
-            /* Navigation links stack vertically and center */
             nav {
                 display: flex;
                 flex-direction: column;
@@ -226,10 +291,8 @@
                 margin: 0;
             }
 
-            /* Prevent the new taller radio player from covering the footer */
             body { padding-bottom: 130px; }
 
-            /* Stack the radio player info on top of the audio controls */
             .sticky-player { 
                 height: auto; 
                 padding: 10px 0; 
@@ -239,7 +302,7 @@
                 gap: 10px; 
             }
             .sticky-player-info { 
-                display: flex; /* Brings the text/logos back from being hidden */
+                display: flex; 
                 width: 100%; 
                 justify-content: center; 
             }
@@ -255,13 +318,11 @@
                 margin-left: 0; 
             }
             
-            /* Expand the section width and reduce the outer padding */
             section {
                 width: 95%; 
                 padding: 20px 15px;
             }
             
-            /* Drastically reduce the internal gig guide padding so text fits */
             #gig-guide {
                 padding: 15px 10px 15px 10px; 
             }
@@ -270,7 +331,6 @@
                 margin-top: -18px; 
             }
             
-            /* Scale down the text sizes slightly so it stays visually tight */
             .date-banner {
                 font-size: 20px;
                 padding-top: 3px;
@@ -279,12 +339,12 @@
             
             .gig-item {
                 font-size: 11px;
-                line-height: 1.2em; /* CRUCIAL: prevents text crashing if it wraps to a second line */
+                line-height: 1.2em; 
                 margin: 4px 0;
             }
 
             .footer-sponsors img {
-                max-width: 30%; /* Ensures logos scale down side-by-side */
+                max-width: 30%; 
             }
         }
     </style>
@@ -301,6 +361,7 @@
     
     <nav>
         <a href="#guide">This Week's Gigs</a>
+        <a href="#map-section">Venue Map</a>
         <a href="#playlist">Local Playlist</a>
         <a href="#submit">Submit a Gig</a>
     </nav>
@@ -323,6 +384,12 @@
         </div>
         
         <button id="download-btn" class="download-btn" style="display: none;" onclick="triggerDownload()">Download Graphic</button>
+    </section>
+
+    <section id="map-section">
+        <h2>Live Music Map</h2>
+        <p>Click a pin to see who's playing at that venue this week.</p>
+        <div id="venue-map"></div>
     </section>
 
     <section id="playlist">
@@ -476,6 +543,103 @@
             return true;
         }
 
+        function buildMap(gigs) {
+            if(window.venueMap != undefined) { 
+                window.venueMap.remove(); 
+            }
+            
+            window.venueMap = L.map('venue-map').setView([-19.2589, 146.8169], 12);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(window.venueMap);
+
+            let venueData = {};
+            gigs.forEach(gig => {
+                if (!gig.coords || gig.coords.trim() === "") return; 
+                
+                const vName = (gig.venue || "Unknown Venue").toUpperCase();
+                
+                if (!venueData[vName]) {
+                    venueData[vName] = {
+                        coords: gig.coords,
+                        isOurVenue: gig.isOurVenue,
+                        venueLink: gig.venueLink, // Capturing the Venue Link for the popup title
+                        gigsList: []
+                    };
+                }
+                
+                let cleanTime = formatTime(gig.time);
+                let formattedDate = formatHeaderDate(gig.date);
+                
+                // NEW: Build the gig text. Make it clickable if a ticket link is provided.
+                let gigText = `${cleanTime} - ${gig.artist}`;
+                if (gig.ticketLink) {
+                    gigText = `<a href="${gig.ticketLink}" target="_blank">${gigText}</a>`;
+                }
+
+                venueData[vName].gigsList.push(`<b>${formattedDate}:</b> ${gigText}`);
+            });
+
+            const standardIcon = L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [20, 33], 
+                iconAnchor: [10, 33],
+                popupAnchor: [1, -28],
+                shadowSize: [33, 33]
+            });
+
+            const featuredIcon = L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [31, 51], 
+                iconAnchor: [15, 51],
+                popupAnchor: [1, -34],
+                shadowSize: [51, 51]
+            });
+
+            let bounds = [];
+
+            Object.keys(venueData).forEach(vName => {
+                let v = venueData[vName];
+                let coordsArr = v.coords.split(',').map(n => parseFloat(n.trim()));
+                
+                if (coordsArr.length === 2 && !isNaN(coordsArr[0]) && !isNaN(coordsArr[1])) {
+                    
+                    let iconToUse = v.isOurVenue ? featuredIcon : standardIcon;
+                    let markerOptions = { icon: iconToUse };
+                    
+                    if (v.isOurVenue) {
+                        markerOptions.zIndexOffset = 1000; 
+                    }
+                    
+                    let marker = L.marker(coordsArr, markerOptions).addTo(window.venueMap);
+                    
+                    // NEW: Build the Popup Title. Make it clickable if a venue link is provided.
+                    let venueTitleText = vName;
+                    if (v.venueLink) {
+                        venueTitleText = `<a href="${v.venueLink}" target="_blank">${vName}</a>`;
+                    }
+                    
+                    let popupHTML = `<div class="popup-venue-title">${venueTitleText}</div>`;
+                    popupHTML += `<div class="popup-gig-list">`;
+                    v.gigsList.forEach(gigString => {
+                        popupHTML += `<div class="popup-gig-item">${gigString}</div>`;
+                    });
+                    popupHTML += `</div>`;
+                    
+                    marker.bindPopup(popupHTML);
+                    bounds.push(coordsArr); 
+                }
+            });
+
+            if (bounds.length > 0) {
+                window.venueMap.fitBounds(bounds, { padding: [40, 40] });
+            }
+        }
+
         async function createAndShowGraphic() {
             try {
                 const response = await fetch(SCRIPT_URL + '&v=' + new Date().getTime());
@@ -483,6 +647,8 @@
                 
                 const success = buildDOM(data);
                 if (!success) return;
+                
+                buildMap(data);
 
                 await document.fonts.ready;
                 
