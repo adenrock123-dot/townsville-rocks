@@ -41,34 +41,50 @@
             background-color: #0a0a0a; color: #f4f4f4; text-align: center;
         }
 
-        /* Sponsor Bar Overlay */
-        .sponsor-bar {
-            position: absolute; top: 0; left: 0; width: 100%; box-sizing: border-box; 
-            background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
-            padding: 15px 20px 30px 20px; display: flex; align-items: center; justify-content: center; gap: 15px; z-index: 10;
-        }
-        .sponsor-bar span {
-            font-family: 'Montserrat', sans-serif; font-size: 0.8rem; color: #d4d4d4; 
-            text-transform: uppercase; letter-spacing: 1px; text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
-        }
-        .sponsor-bar img { height: 25px; width: auto; filter: invert(1) opacity(0.7); transition: opacity 0.3s ease; }
-        .sponsor-bar img:hover { opacity: 1; }
-
         /* Headings */
         h1, h2, h3 { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; color: #DA2121; margin-bottom: 30px; font-size: 2.2rem; }
         p { line-height: 1.6; color: #cccccc; margin-bottom: 20px; }
 
-        /* Header Section */
-        .site-header { position: relative; background-color: #000; padding-bottom: 25px; border-bottom: 3px solid #DA2121; }
-        .site-header img.main-header-img { width: 100%; max-width: 1000px; height: auto; display: block; margin: 0 auto; }
-
         /* Embed Player Overrides */
         .spotify-player { height: 152px !important; border: none !important; background-color: transparent !important; box-shadow: none !important; }
 
-        /* Navigation Bar */
-        nav { background-color: #121212; padding: 20px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222; box-shadow: 0 4px 12px rgba(0,0,0,0.8); }
-        nav a { font-family: 'Oswald', sans-serif; color: #ffffff; text-decoration: none; margin: 0 20px; font-weight: 700; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s ease; }
-        nav a:hover { color: #DA2121; }
+        /* Navigation Bar (Sticky with Branding) */
+        nav { 
+            background-color: #121212; 
+            padding: 15px 30px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            border-bottom: 1px solid #222; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.8); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .nav-branding-left { order: 1; display: flex; align-items: center; flex: 1; justify-content: flex-start; }
+        .nav-branding-left img { max-height: 45px; width: auto; object-fit: contain; }
+        
+        .nav-links { order: 2; display: flex; gap: 20px; align-items: center; justify-content: center; }
+        .nav-links a { font-family: 'Oswald', sans-serif; color: #ffffff; text-decoration: none; font-weight: 700; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s ease; }
+        .nav-links a:hover { color: #DA2121; }
+
+        .nav-branding-right { order: 3; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: 1; }
+        .nav-branding-right span { font-family: 'Montserrat', sans-serif; font-size: 0.65rem; color: #d4d4d4; text-transform: uppercase; letter-spacing: 1px; line-height: 1;}
+        .nav-branding-right img { max-height: 25px; width: auto; filter: invert(1); }
+
+        /* Navigation Responsiveness */
+        @media (max-width: 850px) {
+            nav { padding: 10px 15px; }
+            .nav-branding-left { order: 1; }
+            .nav-branding-right { order: 2; }
+            .nav-links { order: 3; width: 100%; margin-top: 15px; flex-wrap: wrap; justify-content: center; gap: 15px; }
+            .nav-links a { font-size: 0.95rem; margin: 0; }
+            .nav-branding-left img { max-height: 35px; }
+            .nav-branding-right img { max-height: 20px; }
+            .nav-branding-right span { font-size: 0.55rem; }
+        }
 
         /* Section Layouts */
         section { box-sizing: border-box; padding: 40px 30px; width: 85%; max-width: 900px; margin: 40px auto; background-color: #121212; border-radius: 12px; border: 1px solid #222; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
@@ -111,6 +127,12 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.6);
         }
 
+        .main-header { 
+            width: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
         .main-header img { max-width: 100%; height: auto; margin: 10px 0; }
         
         .content-wrapper { 
@@ -224,7 +246,17 @@
             text-transform: uppercase;
         }
 
-        /* NEW: Map Popup Links Styling */
+        .popup-booked-by {
+            font-family: 'Montserrat', sans-serif; 
+            font-size: 0.75rem; 
+            font-weight: 700;
+            color: #DA2121; 
+            margin-top: -3px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .popup-venue-title a {
             color: #D9652B; 
             text-decoration: none;
@@ -281,14 +313,10 @@
            MOBILE RESPONSIVENESS FIXES
            ------------------------------------------------------------- */
         @media (max-width: 650px) {
+            
+            /* Hide the top sticky header entirely on mobile */
             nav {
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-                padding: 15px 0;
-            }
-            nav a {
-                margin: 0;
+                display: none !important;
             }
 
             body { padding-bottom: 130px; }
@@ -339,8 +367,8 @@
             
             .gig-item {
                 font-size: 11px;
-                line-height: 1.2em; 
-                margin: 4px 0;
+                line-height: 1.1em; /* Tightened line height */
+                margin: 1px 0; /* Reduced margin to bring rows closer together */
             }
 
             .footer-sponsors img {
@@ -350,20 +378,23 @@
     </style>
 </head>
 <body>
+    
+    <nav>
+        <div class="nav-branding-left">
+            <img src="images/TR_New_Logo.png" alt="Townsville Rocks">
+        </div>
+        
+        <div class="nav-links">
+            <a href="#guide">This Week's Gigs</a>
+            <a href="#map-section">Venue Map</a>
+            <a href="#playlist">Local Playlist</a>
+            <a href="#submit">Submit a Gig</a>
+        </div>
 
-    <header class="site-header">
-        <div class="sponsor-bar">
+        <div class="nav-branding-right">
             <span>Brought to you by</span>
             <img src="images/Regional Roster Logo V1.png" alt="Regional Roster">
         </div>
-        <img class="main-header-img" src="images/Header.jpg" alt="Townsville Rocks">
-    </header>
-    
-    <nav>
-        <a href="#guide">This Week's Gigs</a>
-        <a href="#map-section">Venue Map</a>
-        <a href="#playlist">Local Playlist</a>
-        <a href="#submit">Submit a Gig</a>
     </nav>
 
     <section id="guide">
@@ -565,7 +596,7 @@
                     venueData[vName] = {
                         coords: gig.coords,
                         isOurVenue: gig.isOurVenue,
-                        venueLink: gig.venueLink, // Capturing the Venue Link for the popup title
+                        venueLink: gig.venueLink, 
                         gigsList: []
                     };
                 }
@@ -573,7 +604,6 @@
                 let cleanTime = formatTime(gig.time);
                 let formattedDate = formatHeaderDate(gig.date);
                 
-                // NEW: Build the gig text. Make it clickable if a ticket link is provided.
                 let gigText = `${cleanTime} - ${gig.artist}`;
                 if (gig.ticketLink) {
                     gigText = `<a href="${gig.ticketLink}" target="_blank">${gigText}</a>`;
@@ -617,13 +647,17 @@
                     
                     let marker = L.marker(coordsArr, markerOptions).addTo(window.venueMap);
                     
-                    // NEW: Build the Popup Title. Make it clickable if a venue link is provided.
                     let venueTitleText = vName;
                     if (v.venueLink) {
                         venueTitleText = `<a href="${v.venueLink}" target="_blank">${vName}</a>`;
                     }
                     
                     let popupHTML = `<div class="popup-venue-title">${venueTitleText}</div>`;
+                    
+                    if (v.isOurVenue) {
+                        popupHTML += `<div class="popup-booked-by">Booked by Regional Roster</div>`;
+                    }
+
                     popupHTML += `<div class="popup-gig-list">`;
                     v.gigsList.forEach(gigString => {
                         popupHTML += `<div class="popup-gig-item">${gigString}</div>`;
