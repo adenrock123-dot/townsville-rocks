@@ -117,7 +117,7 @@
             width: 100%; 
             background: #000000; 
             box-sizing: border-box;
-            padding: 25px 50px 25px 50px; 
+            padding: 25px 50px 50px 50px; 
             display: none; 
             flex-direction: column; 
             align-items: center;
@@ -135,7 +135,6 @@
         }
         .main-header img { max-width: 100%; height: auto; margin: 10px 0 5px 0; }
         
-        /* NEW: Styling for the Regional Roster sponsor line on the graphic */
         .poster-sponsor {
             font-family: 'Montserrat', sans-serif;
             font-size: 0.85rem;
@@ -153,6 +152,7 @@
             flex-direction: column; 
             align-items: center; 
             padding-top: 15px;
+            padding-bottom: 0.5px; /* Tightened so it doesn't look like a blank missing line */
         }
         
         #guide-content { width: 100%; padding-bottom: 4px; display: flex; flex-direction: column; align-items: center; }
@@ -205,25 +205,6 @@
         }
         .gig-item a.venue-link:hover {
             color: #DA2121; 
-        }
-        
-        .footer-sponsors { 
-            width: 100%; 
-            display: flex; 
-            justify-content: center; 
-            gap: 15px; 
-            align-items: center; 
-            box-sizing: border-box; 
-            border-top: 30px solid #000000; 
-            padding: 0px 0px; 
-            background: #ffffff;
-        }
-        
-        .footer-sponsors img { 
-            max-height: 190px; 
-            width: auto; 
-            max-width: 40%; 
-            object-fit: contain; 
         }
 
         /* -------------------------------------------------------------
@@ -381,10 +362,6 @@
                 line-height: 1.1em; /* Tightened line height */
                 margin: 1px 0; /* Reduced margin to bring rows closer together */
             }
-
-            .footer-sponsors img {
-                max-width: 30%; 
-            }
         }
     </style>
 </head>
@@ -414,16 +391,10 @@
         <div id="gig-guide">
             <div class="main-header">
                 <img src="images/main_logo.png" alt="Townsville Rocks">
-                <!-- NEW: Sponsor line injected into the graphic header -->
                 <div class="poster-sponsor">Brought to you by Regional Roster</div>
             </div>
             <div class="content-wrapper">
                 <div id="guide-content"></div>
-                <div class="footer-sponsors">
-                    <img src="images/puft.png" alt="Puft Events">
-                    <img src="images/warehouse.png" alt="The Warehouse">
-                    <img src="images/cotters.png" alt="Cotters Market">
-                </div>
             </div>
         </div>
         
