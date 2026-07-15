@@ -524,55 +524,59 @@
         }
 
         function buildDOM(gigs) {
-            if (!gigs || gigs.length === 0) {
-                document.getElementById('loading-spinner').innerText = "No gigs published this week.";
-                return false;
+    if (!gigs || gigs.length === 0) {
+        document.getElementById('loading-spinner').innerText = "No gigs published this week.";
+        return false;
+    }
+
+    const container = document.getElementById('guide-content');
+    container.innerHTML = ''; 
+
+    let currentGroupDate = "";
+
+    gigs.forEach(gig => {
+        const rawDate = gig.date; 
+        let cleanTime = formatTime(gig.time);
+        
+        if (rawDate && cleanTime && gig.artist) {
+            const formattedHeader = formatHeaderDate(rawDate);
+
+            if (formattedHeader !== currentGroupDate) {
+                const dateEl = document.createElement('div');
+                dateEl.className = 'date-banner';
+                dateEl.innerText = formattedHeader;
+                container.appendChild(dateEl);
+                currentGroupDate = formattedHeader;
             }
 
-            const container = document.getElementById('guide-content');
-            container.innerHTML = ''; 
+            const gigEl = document.createElement('div');
+            gigEl.className = 'gig-item';
+            
+            let timePart = cleanTime.toUpperCase();
+            let venuePart = (gig.venue || "").toUpperCase();
+            let artistPart = (gig.artist || "").toUpperCase();
 
-            let currentGroupDate = "";
+            // Handle Venue Hyperlinking based on venueLink or if it's our venue
+            if (gig.venueLink) {
+                venuePart = `<a href="${gig.venueLink}" class="venue-link" target="_blank">${venuePart}</a>`;
+            } else if (gig.isOurVenue) {
+                // If it's your venue and has no specific venueLink, you can assign a default or class here if needed
+                venuePart = `<span class="our-venue">${venuePart}</span>`;
+            }
 
-            gigs.forEach(gig => {
-                const rawDate = gig.date; 
-                let cleanTime = formatTime(gig.time); 
-                
-                if (rawDate && cleanTime && gig.artist) {
-                    const formattedHeader = formatHeaderDate(rawDate);
-
-                    if (formattedHeader !== currentGroupDate) {
-                        const dateEl = document.createElement('div');
-                        dateEl.className = 'date-banner';
-                        dateEl.innerText = formattedHeader;
-                        container.appendChild(dateEl);
-                        currentGroupDate = formattedHeader;
-                    }
-
-                    const gigEl = document.createElement('div');
-                    gigEl.className = 'gig-item';
-                    
-                    let timePart = cleanTime.toUpperCase();
-                    let venuePart = (gig.venue || "").toUpperCase();
-                    let artistPart = (gig.artist || "").toUpperCase();
-
-                    if (gig.venueLink) {
-                        venuePart = `<a href="${gig.venueLink}" class="venue-link" target="_blank">${venuePart}</a>`;
-                    }
-                    
-                    const venueName = (gig.venue || "").toLowerCase().trim();
-                    
-                    if ((venueName === "the warehouse" || venueName ===  "otherwise bar") && gig.ticketLink && !gig.venueLink) {
-                        gigEl.innerHTML = `<a href="${gig.ticketLink}" target="_blank">${timePart} - ${(gig.venue || "").toUpperCase()} - ${artistPart}</a>`;
-                    } else {
-                        gigEl.innerHTML = `${timePart} - ${venuePart} - ${artistPart}`; 
-                    }
-                    
-                    container.appendChild(gigEl);
-                }
-            });
-            return true;
+            // Ticket link takes absolute precedence over the venue display
+            if (gig.ticketLink) {
+                const linkClass = gig.isOurVenue ? 'our-venue-link' : 'ticket-link';
+                gigEl.innerHTML = `<a href="${gig.ticketLink}" class="${linkClass}" target="_blank">${timePart} - ${venuePart} - ${artistPart}</a>`;
+            } else {
+                gigEl.innerHTML = `${timePart} - ${venuePart} - ${artistPart}`; 
+            }
+            
+            container.appendChild(gigEl);
         }
+    });
+    return true;
+}
 
         function buildMap(gigs) {
             if(window.venueMap != undefined) { 
