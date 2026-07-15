@@ -562,7 +562,7 @@
                     
                     const venueName = (gig.venue || "").toLowerCase().trim();
                     
-                    if (venueName === "the warehouse" "otherwise" && gig.ticketLink && !gig.venueLink) {
+                    if ((venueName === "the warehouse" || venueName ===  "otherwise bar") && gig.ticketLink && !gig.venueLink) {
                         gigEl.innerHTML = `<a href="${gig.ticketLink}" target="_blank">${timePart} - ${(gig.venue || "").toUpperCase()} - ${artistPart}</a>`;
                     } else {
                         gigEl.innerHTML = `${timePart} - ${venuePart} - ${artistPart}`; 
