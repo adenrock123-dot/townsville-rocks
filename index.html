@@ -133,7 +133,18 @@
             flex-direction: column; 
             align-items: center; 
         }
-        .main-header img { max-width: 100%; height: auto; margin: 10px 0; }
+        .main-header img { max-width: 100%; height: auto; margin: 10px 0 5px 0; }
+        
+        /* NEW: Styling for the Regional Roster sponsor line on the graphic */
+        .poster-sponsor {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            color: #DA2121;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+        }
         
         .content-wrapper { 
             background: #ffffff; 
@@ -403,6 +414,8 @@
         <div id="gig-guide">
             <div class="main-header">
                 <img src="images/main_logo.png" alt="Townsville Rocks">
+                <!-- NEW: Sponsor line injected into the graphic header -->
+                <div class="poster-sponsor">Brought to you by Regional Roster</div>
             </div>
             <div class="content-wrapper">
                 <div id="guide-content"></div>
@@ -524,59 +537,55 @@
         }
 
         function buildDOM(gigs) {
-    if (!gigs || gigs.length === 0) {
-        document.getElementById('loading-spinner').innerText = "No gigs published this week.";
-        return false;
-    }
-
-    const container = document.getElementById('guide-content');
-    container.innerHTML = ''; 
-
-    let currentGroupDate = "";
-
-    gigs.forEach(gig => {
-        const rawDate = gig.date; 
-        let cleanTime = formatTime(gig.time);
-        
-        if (rawDate && cleanTime && gig.artist) {
-            const formattedHeader = formatHeaderDate(rawDate);
-
-            if (formattedHeader !== currentGroupDate) {
-                const dateEl = document.createElement('div');
-                dateEl.className = 'date-banner';
-                dateEl.innerText = formattedHeader;
-                container.appendChild(dateEl);
-                currentGroupDate = formattedHeader;
+            if (!gigs || gigs.length === 0) {
+                document.getElementById('loading-spinner').innerText = "No gigs published this week.";
+                return false;
             }
 
-            const gigEl = document.createElement('div');
-            gigEl.className = 'gig-item';
-            
-            let timePart = cleanTime.toUpperCase();
-            let rawVenue = (gig.venue || "").toUpperCase(); // Keep this as plain text initially
-            let artistPart = (gig.artist || "").toUpperCase();
+            const container = document.getElementById('guide-content');
+            container.innerHTML = ''; 
 
-            // 1. TICKET LINK PRECEDENCE
-            if (gig.ticketLink) {
-                // If there's a ticket link, wrap the whole row. DO NOT hyperlink the venue separately.
-                const linkClass = gig.isOurVenue ? 'our-venue-link' : 'ticket-link';
-                gigEl.innerHTML = `<a href="${gig.ticketLink}" class="${linkClass}" target="_blank">${timePart} - ${rawVenue} - ${artistPart}</a>`;
-            } 
-            // 2. VENUE LINK ONLY (Fallback if no ticket link exists)
-            else if (gig.venueLink) {
-                let venueHTML = `<a href="${gig.venueLink}" class="venue-link" target="_blank">${rawVenue}</a>`;
-                gigEl.innerHTML = `${timePart} - ${venueHTML} - ${artistPart}`;
-            } 
-            // 3. NO LINKS AT ALL
-            else {
-                gigEl.innerHTML = `${timePart} - ${rawVenue} - ${artistPart}`;
-            }
-            
-            container.appendChild(gigEl);
+            let currentGroupDate = "";
+
+            gigs.forEach(gig => {
+                const rawDate = gig.date; 
+                let cleanTime = formatTime(gig.time);
+                
+                if (rawDate && cleanTime && gig.artist) {
+                    const formattedHeader = formatHeaderDate(rawDate);
+
+                    if (formattedHeader !== currentGroupDate) {
+                        const dateEl = document.createElement('div');
+                        dateEl.className = 'date-banner';
+                        dateEl.innerText = formattedHeader;
+                        container.appendChild(dateEl);
+                        currentGroupDate = formattedHeader;
+                    }
+
+                    const gigEl = document.createElement('div');
+                    gigEl.className = 'gig-item';
+                    
+                    let timePart = cleanTime.toUpperCase();
+                    let rawVenue = (gig.venue || "").toUpperCase(); 
+                    let artistPart = (gig.artist || "").toUpperCase();
+
+                    if (gig.ticketLink) {
+                        const linkClass = gig.isOurVenue ? 'our-venue-link' : 'ticket-link';
+                        gigEl.innerHTML = `<a href="${gig.ticketLink}" class="${linkClass}" target="_blank">${timePart} - ${rawVenue} - ${artistPart}</a>`;
+                    } 
+                    else if (gig.venueLink) {
+                        let venueHTML = `<a href="${gig.venueLink}" class="venue-link" target="_blank">${rawVenue}</a>`;
+                        gigEl.innerHTML = `${timePart} - ${venueHTML} - ${artistPart}`;
+                    } 
+                    else {
+                        gigEl.innerHTML = `${timePart} - ${rawVenue} - ${artistPart}`;
+                    }
+                    
+                    container.appendChild(gigEl);
+                }
+            });
+            return true;
         }
-    });
-    return true;
-}
 
         function buildMap(gigs) {
             if(window.venueMap != undefined) { 
