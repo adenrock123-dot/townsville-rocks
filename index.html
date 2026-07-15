@@ -553,23 +553,23 @@
             gigEl.className = 'gig-item';
             
             let timePart = cleanTime.toUpperCase();
-            let venuePart = (gig.venue || "").toUpperCase();
+            let rawVenue = (gig.venue || "").toUpperCase(); // Keep this as plain text initially
             let artistPart = (gig.artist || "").toUpperCase();
 
-            // Handle Venue Hyperlinking based on venueLink or if it's our venue
-            if (gig.venueLink) {
-                venuePart = `<a href="${gig.venueLink}" class="venue-link" target="_blank">${venuePart}</a>`;
-            } else if (gig.isOurVenue) {
-                // If it's your venue and has no specific venueLink, you can assign a default or class here if needed
-                venuePart = `<span class="our-venue">${venuePart}</span>`;
-            }
-
-            // Ticket link takes absolute precedence over the venue display
+            // 1. TICKET LINK PRECEDENCE
             if (gig.ticketLink) {
+                // If there's a ticket link, wrap the whole row. DO NOT hyperlink the venue separately.
                 const linkClass = gig.isOurVenue ? 'our-venue-link' : 'ticket-link';
-                gigEl.innerHTML = `<a href="${gig.ticketLink}" class="${linkClass}" target="_blank">${timePart} - ${venuePart} - ${artistPart}</a>`;
-            } else {
-                gigEl.innerHTML = `${timePart} - ${venuePart} - ${artistPart}`; 
+                gigEl.innerHTML = `<a href="${gig.ticketLink}" class="${linkClass}" target="_blank">${timePart} - ${rawVenue} - ${artistPart}</a>`;
+            } 
+            // 2. VENUE LINK ONLY (Fallback if no ticket link exists)
+            else if (gig.venueLink) {
+                let venueHTML = `<a href="${gig.venueLink}" class="venue-link" target="_blank">${rawVenue}</a>`;
+                gigEl.innerHTML = `${timePart} - ${venueHTML} - ${artistPart}`;
+            } 
+            // 3. NO LINKS AT ALL
+            else {
+                gigEl.innerHTML = `${timePart} - ${rawVenue} - ${artistPart}`;
             }
             
             container.appendChild(gigEl);
