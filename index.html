@@ -185,9 +185,9 @@
             text-transform: uppercase; 
             text-align: center; 
             letter-spacing: 0px; 
-            line-height: .65em; 
+            line-height: 1.2em; /* Prevents text from overlapping on wrap */
             width: 95%; 
-            margin: 2px 0; 
+            margin: 3px 0; /* Adjusted for visual balance */
         }
         
         .gig-item a { 
@@ -374,11 +374,10 @@
             
             .gig-item {
                 font-size: 11px;
-                line-height: 1.1em; /* Tightened line height */
-                margin: 1px 0; /* Reduced margin to bring rows closer together */
+                line-height: 1.2em; /* Ensures mobile wrapping is also safe */
+                margin: 2px 0;
             }
 
-            /* NEW: Tighten the promo footer gap on mobile */
             .poster-footer {
                 margin-top: 15px;
             }
