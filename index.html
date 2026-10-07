@@ -687,25 +687,55 @@
             }
         }
 
+        async function fetchGigData() {
+            // Apps Script can occasionally return a Google HTML error page.
+            // Retry fresh requests rather than treating that page as JSON.
+            let lastError;
+            for (let attempt = 0; attempt < 3; attempt++) {
+                try {
+                    const response = await fetch(SCRIPT_URL + '&v=' + Date.now(), {
+                        credentials: 'omit'
+                    });
+                    if (!response.ok) throw new Error('Gig feed returned HTTP ' + response.status);
+                    const data = await response.json();
+                    if (!Array.isArray(data)) throw new Error('Gig feed did not return a list');
+                    return data;
+                } catch (error) {
+                    lastError = error;
+                    if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+                }
+            }
+            throw lastError;
+        }
+
         async function createAndShowGraphic() {
+            const spinner = document.getElementById('loading-spinner');
+            spinner.textContent = "GENERATING THIS WEEK'S GIG GUIDE...";
             try {
-                const response = await fetch(SCRIPT_URL + '&v=' + new Date().getTime());
-                const data = await response.json();
-                
+                const data = await fetchGigData();
                 const success = buildDOM(data);
                 if (!success) return;
-                
-                buildMap(data);
 
-                await document.fonts.ready;
-                
-                document.getElementById('loading-spinner').style.display = "none";
+                // Show the guide independently of optional maps and web fonts.
+                spinner.style.display = "none";
                 document.getElementById('gig-guide').style.display = "flex";
                 document.getElementById('download-btn').style.display = "block";
 
+                try {
+                    buildMap(data);
+                } catch (error) {
+                    console.error("Map error:", error);
+                    document.getElementById('venue-map').textContent = "The venue map is temporarily unavailable. Gig listings are shown above.";
+                }
             } catch (error) {
-                console.error("Fetch error:", error);
-                document.getElementById('loading-spinner').innerText = "Error pulling gig data.";
+                console.error("Gig feed error:", error);
+                spinner.textContent = "The gig guide couldn't load. ";
+                const retry = document.createElement('button');
+                retry.type = "button";
+                retry.className = "download-btn";
+                retry.textContent = "Try again";
+                retry.addEventListener('click', createAndShowGraphic);
+                spinner.appendChild(retry);
             }
         }
 
